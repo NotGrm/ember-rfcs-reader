@@ -4,6 +4,7 @@ export default class EmberRfcsReader extends Component {
 
   @tracked state = {
     filter: 'open',
+    current: 0,
     page: 1,
     rateLimit: 0,
     rateLimitRemaining: 0,
@@ -76,6 +77,15 @@ export default class EmberRfcsReader extends Component {
     let newPage = page + direction === 'next' ? 1 : -1
 
     this.loadPulls(this.state.filter, newPage);
+  }
+
+  selectPullRequest(number, event) {
+    event.preventDefault();
+    
+    this.state = {
+      ...this.state,
+      current: number
+    }    
   }
 
   filterPullRequests(filter) {    

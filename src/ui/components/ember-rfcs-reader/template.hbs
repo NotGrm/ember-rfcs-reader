@@ -9,7 +9,10 @@
     </header>
     <div class="pull-requests">
       {{#each state.pullRequests key="pull.id" as |pull|}}
-        <pull-request @pr={{pull}} />
+        <pull-request 
+          @pr={{pull}} 
+          @selected={{state.current}}
+          @onclick={{action selectPullRequest pull.number}} />
       {{/each}}
     </div>
     <footer>

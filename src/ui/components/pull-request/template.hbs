@@ -1,4 +1,6 @@
-<div class="pull-request">
+<a href="#"
+  class="list-group-item list-group-item-action {{if isActive 'active'}}"
+  onclick={{action @onclick}}>
   <header class="pull-request__header">
     <small><span>#{{@pr.number}}</span></small>
     <span class={{badgeClass}}>{{@pr.state}}</span>
@@ -7,4 +9,4 @@
   <small>
       Created by {{@pr.user.login}}, {{@pr.created_at}} ago
   </small>
-</div>
+</a>
