@@ -1,1 +1,34 @@
-<div><h1>Welcome to Glimmer!</h1></div>
+<div class="row no-gutters">
+  <div class="sidebar">
+    <header>
+      <div class="btn-group">
+        <button class="btn btn-secondary" disabled={{openSelected}} onclick={{action filterPullRequests 'open'}}>Open</button>
+        <button class="btn btn-secondary" disabled={{closedSelected}} onclick={{action filterPullRequests 'closed'}}>Closed</button>
+        <button class="btn btn-secondary" disabled={{allSelected}} onclick={{action filterPullRequests 'all'}}>All</button>
+      </div>
+    </header>
+    <div class="pull-requests">
+      {{#each state.pullRequests key="pull.id" as |pull|}}
+        <pull-request @pr={{pull}} />
+      {{/each}}
+    </div>
+    <footer>
+      <ul class="pagination pagination-sm justify-content-center">
+        <li class="page-item {{if hasNoPrev 'disabled'}}">
+          <a href="#" class="page-link" onclick={{action changePage 'prev'}}>Prev</a>
+        </li>
+        <li class="page-item {{if hasNoNext 'disabled'}}">
+          <a href="#" class="page-link" onclick={{action changePage 'next'}}>Next</a>
+        </li>
+      </ul>
+    </footer>
+  </div>
+  <div class="main">
+    <div class="content">
+      <h1>Welcome to Glimmer!</h1>
+    </div>
+    <footer>
+      Github API status: {{state.rateLimitRemaining}} requests available out of {{state.rateLimit}} allowed. Reset in {{rateLimitResetRemaining}} seconds
+    </footer>
+  </div>
+</div>
