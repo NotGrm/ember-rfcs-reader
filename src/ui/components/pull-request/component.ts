@@ -4,9 +4,9 @@ export default class PullRequest extends Component {
 
   @tracked('args')
   get isActive() {
-    const { pr, selected } = this.args;
+    const { pr, selected } = this.args;    
     
-    return pr.number == selected;
+    return selected != null ? pr.number == selected.number : false;
   }
 
   @tracked('args')

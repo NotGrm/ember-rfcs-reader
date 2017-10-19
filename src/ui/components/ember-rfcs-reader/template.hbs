@@ -11,8 +11,7 @@
       {{#each state.pullRequests key="pull.id" as |pull|}}
         <pull-request 
           @pr={{pull}} 
-          @selected={{state.current}}
-          @onclick={{action selectPullRequest pull.number}} />
+          @selected={{state.current}} />
       {{/each}}
     </div>
     <footer>
@@ -28,7 +27,9 @@
   </div>
   <div class="main">
     <div class="content">
-      <h1>Welcome to Glimmer!</h1>
+      <header>
+        <h1 class="text-center">{{state.current.title}}</h1>
+      </header>
     </div>
     <footer>
       Github API status: {{state.rateLimitRemaining}} requests available out of {{state.rateLimit}} allowed. Reset in {{rateLimitResetRemaining}} seconds

@@ -1,10 +1,13 @@
 import Component, { tracked } from '@glimmer/component';
+import Navigo from 'navigo';
+
+const router = new Navigo(null, true);
 
 export default class EmberRfcsReader extends Component {
 
   @tracked state = {
     filter: 'open',
-    current: 0,
+    current: null,
     page: 1,
     rateLimit: 0,
     rateLimitRemaining: 0,
@@ -51,6 +54,17 @@ export default class EmberRfcsReader extends Component {
   constructor(options) {
     super(options);
     this.loadPulls(this.state.filter, this.state.page);
+
+    router.on({
+      '/pull_requests/:id': (params) => {        
+        let current = this.state.pullRequests.find(pr => pr.number === Number(params.id));
+        
+        this.state = {
+          ...this.state,
+          current
+        }
+      }
+    })
   }
 
   async loadPulls(filter, page) {
@@ -70,22 +84,17 @@ export default class EmberRfcsReader extends Component {
       page,
       pullRequests
     }
+
+    router.resolve();
   }
 
-  changePage(direction) {
+  changePage(direction, event) {
+    event.preventDefault();
+
     const { page } = this.state;
     let newPage = page + direction === 'next' ? 1 : -1
 
     this.loadPulls(this.state.filter, newPage);
-  }
-
-  selectPullRequest(number, event) {
-    event.preventDefault();
-    
-    this.state = {
-      ...this.state,
-      current: number
-    }    
   }
 
   filterPullRequests(filter) {    
