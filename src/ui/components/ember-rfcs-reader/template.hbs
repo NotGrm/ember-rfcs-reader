@@ -30,6 +30,7 @@
       <header>
         <h1 class="text-center">{{state.current.title}}</h1>
       </header>
+      <pull-request-details @pr={{state.current}} />
     </div>
     <footer>
       Github API status: {{state.rateLimitRemaining}} requests available out of {{state.rateLimit}} allowed. Reset in {{rateLimitResetRemaining}} seconds

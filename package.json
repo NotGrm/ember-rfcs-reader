@@ -35,5 +35,8 @@
   "dependencies": {
     "bootstrap": "4.0.0-beta",
     "navigo": "^5.3.2",
+    "rollup-plugin-commonjs": "^8.2.4",
+    "rollup-plugin-node-resolve": "^3.0.0",
+    "showdown": "^1.7.6"
   }
 }
