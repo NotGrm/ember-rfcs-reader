@@ -9,16 +9,26 @@ h1 {
   margin-left: 0;
 
   > .sidebar,
+  > .main,
   > [class*="col-"] {
-    padding-right: 0;
-    padding-left: 0;
+    padding-right: 0!important;
+    padding-left: 0!important;
+  }
+}
+
+.sidebar, .main {
+  height: 100vh;
+  max-height: 100vh;
+}
+
+.main {
+  .content {
+    overflow: scroll;
   }
 }
 
 .sidebar {
   @extend .col-3;
-
-  height: 100vh;
 
   display: flex;
   flex-direction: column;

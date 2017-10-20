@@ -26,12 +26,10 @@
     </footer>
   </div>
   <div class="main">
-    <div class="content">
-      <header>
-        <h1 class="text-center">{{state.current.title}}</h1>
-      </header>
-      <pull-request-details @pr={{state.current}} />
-    </div>
+    {{#if state.errorMessage}}
+      <div class="alert alert-danger" role="alert">{{state.errorMessage}}</div>
+    {{/if}}
+    <pull-request-details @pr={{state.current}} />
     <footer>
       Github API status: {{state.rateLimitRemaining}} requests available out of {{state.rateLimit}} allowed. Reset in {{rateLimitResetRemaining}} seconds
     </footer>

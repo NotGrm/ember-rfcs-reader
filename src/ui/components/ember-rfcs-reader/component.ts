@@ -2,18 +2,21 @@ import Component, { tracked } from '@glimmer/component';
 import Navigo from 'navigo';
 
 const router = new Navigo(null, true);
+const GITHUB_REPOS_API_URL = 'https://api.github.com/repos';
+const EMBERJS_RFCS_REPO = 'emberjs/rfcs';
 
 export default class EmberRfcsReader extends Component {
 
   @tracked state = {
     filter: 'open',
-    current: null,
     page: 1,
     rateLimit: 0,
     rateLimitRemaining: 0,
     rateLimitReset: 0,
     hasPrev: false,
     hasNext: false,
+    errorMessage: undefined,
+    current: undefined,
     pullRequests: [],
   }
 
@@ -53,22 +56,32 @@ export default class EmberRfcsReader extends Component {
 
   constructor(options) {
     super(options);
-    this.loadPulls(this.state.filter, this.state.page);
+
+    const { filter, page } = this.state;
+
+    this.loadRfcList(filter, page).then(() => {
+      router.resolve();
+    });
 
     router.on({
       '/pull_requests/:id': (params) => {        
         let current = this.state.pullRequests.find(pr => pr.number === Number(params.id));
-        
-        this.state = {
-          ...this.state,
-          current
+
+        if(current) {
+          this.loadRfcContent(current)
+        } else {
+          this.state = {
+            ...this.state,
+            errorMessage: `Cannot find RFC with number ${params.id}`
+          }
         }
+
       }
     })
   }
 
-  async loadPulls(filter, page) {
-    let response = await fetch(`https://api.github.com/repos/emberjs/rfcs/pulls?page=${page}&state=${filter}`);
+  async loadRfcList(filter, page) {
+    let response = await fetch(`${GITHUB_REPOS_API_URL}/${EMBERJS_RFCS_REPO}/pulls?page=${page}&state=${filter}`);
     
     this.parseRateLimitHeaders(response.headers);
     let pullRequests = [];
@@ -84,8 +97,36 @@ export default class EmberRfcsReader extends Component {
       page,
       pullRequests
     }
+  }
 
-    router.resolve();
+  async loadRfcContent(pr) {    
+    const { body, head } = pr;
+    const { ref, repo } = head;
+
+    let response = await fetch(`${GITHUB_REPOS_API_URL}/${repo.full_name}/contents/text?ref=${ref}`);
+    let files = await response.json();
+
+    let file = files.find(f => f.name.includes('0000'))
+    let content = await this.getFileContent(file.url)
+
+    let pullRequest = {
+      number: pr.number,
+      title: pr.title,
+      body: atob(content)
+    }
+    
+    this.state = {
+      ...this.state,
+      errorMessage: undefined,
+      current: pullRequest
+    }
+  }
+
+  async getFileContent(url) {
+    let response = await fetch(url)
+    let file = await response.json()
+
+    return file.content
   }
 
   changePage(direction, event) {
@@ -94,11 +135,11 @@ export default class EmberRfcsReader extends Component {
     const { page } = this.state;
     let newPage = page + direction === 'next' ? 1 : -1
 
-    this.loadPulls(this.state.filter, newPage);
+    this.loadRfcList(this.state.filter, newPage);
   }
 
   filterPullRequests(filter) {    
-    this.loadPulls(filter, 1);
+    this.loadRfcList(filter, 1);
   }
 
   parseRateLimitHeaders(headers: Headers) {
