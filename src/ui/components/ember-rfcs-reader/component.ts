@@ -8,7 +8,6 @@ const EMBERJS_RFCS_REPO = 'emberjs/rfcs';
 export default class EmberRfcsReader extends Component {
 
   @tracked state = {
-    filter: 'open',
     page: 1,
     rateLimit: 0,
     rateLimitRemaining: 0,
@@ -21,16 +20,6 @@ export default class EmberRfcsReader extends Component {
   }
 
   @tracked('state')
-  get hasNoPrev() {
-    return !this.state.hasPrev;
-  }
-
-  @tracked('state')
-  get hasNoNext() {
-    return !this.state.hasNext;
-  }
-
-  @tracked('state')
   get rateLimitResetRemaining() {
     if(this.state.rateLimitReset == 0) {
       return 0;
@@ -39,27 +28,10 @@ export default class EmberRfcsReader extends Component {
     return this.state.rateLimitReset - Math.round(Date.now() / 1000.0)
   }
 
-  @tracked('state')
-  get allSelected() {    
-    return this.state.filter === 'all';
-  }
-
-  @tracked('state')
-  get openSelected() {
-    return this.state.filter === 'open';
-  }
-
-  @tracked('state')
-  get closedSelected() {
-    return this.state.filter === 'closed';
-  }
-
   constructor(options) {
     super(options);
 
-    const { filter, page } = this.state;
-
-    this.loadRfcList(filter, page).then(() => {
+    this.loadRfcList().then(() => {
       router.resolve();
     });
 
@@ -80,7 +52,7 @@ export default class EmberRfcsReader extends Component {
     })
   }
 
-  async loadRfcList(filter, page) {
+  async loadRfcList(page = 1, filter = 'open') {  
     let response = await fetch(`${GITHUB_REPOS_API_URL}/${EMBERJS_RFCS_REPO}/pulls?page=${page}&state=${filter}`);
     
     this.parseRateLimitHeaders(response.headers);
@@ -89,11 +61,10 @@ export default class EmberRfcsReader extends Component {
     if(response.status == 200) {
       this.parseLinkHeader(response.headers);
       pullRequests = await response.json();
-    } 
-
+    }
+    
     this.state = {
       ...this.state,
-      filter,
       page,
       pullRequests
     }
@@ -132,14 +103,17 @@ export default class EmberRfcsReader extends Component {
   changePage(direction, event) {
     event.preventDefault();
 
+    console.log('test');
+    
+
     const { page } = this.state;
     let newPage = page + direction === 'next' ? 1 : -1
 
-    this.loadRfcList(this.state.filter, newPage);
+    this.loadRfcList(newPage);
   }
 
   filterPullRequests(filter) {    
-    this.loadRfcList(filter, 1);
+    this.loadRfcList(filter);
   }
 
   parseRateLimitHeaders(headers: Headers) {

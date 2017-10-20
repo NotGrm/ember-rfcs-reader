@@ -1,17 +1,10 @@
 import Component, { tracked } from '@glimmer/component';
 
-export default class PullRequest extends Component {
-
-  @tracked('args')
-  get isActive() {
-    const { pr, selected } = this.args;    
-    
-    return selected != null ? pr.number == selected.number : false;
-  }
+export default class RfcItem extends Component {
 
   @tracked('args')
   get badgeClass() {
-    let state = this.args.pr.state;
+    let state = this.args.item.state;
     
     switch (state) {
       case "open": return 'badge badge-success'
