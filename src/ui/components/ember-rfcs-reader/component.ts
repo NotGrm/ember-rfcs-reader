@@ -53,16 +53,29 @@ export default class EmberRfcsReader extends Component {
 
   constructor(options) {
     super(options);
-    this.loadPulls(this.state.filter, this.state.page);
+
+    const { filter, page } = this.state;
+
+    this.loadPulls(filter, page).then(() => {
+      router.resolve();
+    });
 
     router.on({
       '/pull_requests/:id': (params) => {        
         let current = this.state.pullRequests.find(pr => pr.number === Number(params.id));
-        
-        this.state = {
-          ...this.state,
-          current
-        }
+
+        this.loadContent(current).then(content => {
+          let pullRequest = {
+            number: current.number,
+            title: current.title,
+            content 
+          }
+          
+          this.state = {
+            ...this.state,
+            current: pullRequest
+          }
+        })
       }
     })
   }
@@ -84,8 +97,16 @@ export default class EmberRfcsReader extends Component {
       page,
       pullRequests
     }
+  }
 
-    router.resolve();
+  async loadContent(pr) {    
+    const { body, head } = pr;
+    const { ref, repo } = head;
+
+    let response = await fetch(`https://api.github.com/repos/${repo.full_name}/contents/text/0000-${ref}.md?ref=${ref}`);
+    let file = await response.json();   
+    
+    return atob(file.content);
   }
 
   changePage(direction, event) {
