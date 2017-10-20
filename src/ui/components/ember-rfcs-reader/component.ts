@@ -2,29 +2,21 @@ import Component, { tracked } from '@glimmer/component';
 import Navigo from 'navigo';
 
 const router = new Navigo(null, true);
+const GITHUB_REPOS_API_URL = 'https://api.github.com/repos';
+const EMBERJS_RFCS_REPO = 'emberjs/rfcs';
 
 export default class EmberRfcsReader extends Component {
 
   @tracked state = {
-    filter: 'open',
-    current: null,
     page: 1,
     rateLimit: 0,
     rateLimitRemaining: 0,
     rateLimitReset: 0,
     hasPrev: false,
     hasNext: false,
+    errorMessage: undefined,
+    current: undefined,
     pullRequests: [],
-  }
-
-  @tracked('state')
-  get hasNoPrev() {
-    return !this.state.hasPrev;
-  }
-
-  @tracked('state')
-  get hasNoNext() {
-    return !this.state.hasNext;
   }
 
   @tracked('state')
@@ -36,27 +28,10 @@ export default class EmberRfcsReader extends Component {
     return this.state.rateLimitReset - Math.round(Date.now() / 1000.0)
   }
 
-  @tracked('state')
-  get allSelected() {    
-    return this.state.filter === 'all';
-  }
-
-  @tracked('state')
-  get openSelected() {
-    return this.state.filter === 'open';
-  }
-
-  @tracked('state')
-  get closedSelected() {
-    return this.state.filter === 'closed';
-  }
-
   constructor(options) {
     super(options);
 
-    const { filter, page } = this.state;
-
-    this.loadPulls(filter, page).then(() => {
+    this.loadRfcList().then(() => {
       router.resolve();
     });
 
@@ -64,24 +39,21 @@ export default class EmberRfcsReader extends Component {
       '/pull_requests/:id': (params) => {        
         let current = this.state.pullRequests.find(pr => pr.number === Number(params.id));
 
-        this.loadContent(current).then(content => {
-          let pullRequest = {
-            number: current.number,
-            title: current.title,
-            content 
-          }
-          
+        if(current) {
+          this.loadRfcContent(current)
+        } else {
           this.state = {
             ...this.state,
-            current: pullRequest
+            errorMessage: `Cannot find RFC with number ${params.id}`
           }
-        })
+        }
+
       }
     })
   }
 
-  async loadPulls(filter, page) {
-    let response = await fetch(`https://api.github.com/repos/emberjs/rfcs/pulls?page=${page}&state=${filter}`);
+  async loadRfcList(page = 1, filter = 'open') {  
+    let response = await fetch(`${GITHUB_REPOS_API_URL}/${EMBERJS_RFCS_REPO}/pulls?page=${page}&state=${filter}`);
     
     this.parseRateLimitHeaders(response.headers);
     let pullRequests = [];
@@ -89,37 +61,59 @@ export default class EmberRfcsReader extends Component {
     if(response.status == 200) {
       this.parseLinkHeader(response.headers);
       pullRequests = await response.json();
-    } 
-
+    }
+    
     this.state = {
       ...this.state,
-      filter,
       page,
       pullRequests
     }
   }
 
-  async loadContent(pr) {    
+  async loadRfcContent(pr) {    
     const { body, head } = pr;
     const { ref, repo } = head;
 
-    let response = await fetch(`https://api.github.com/repos/${repo.full_name}/contents/text/0000-${ref}.md?ref=${ref}`);
-    let file = await response.json();   
+    let response = await fetch(`${GITHUB_REPOS_API_URL}/${repo.full_name}/contents/text?ref=${ref}`);
+    let files = await response.json();
+
+    let file = files.find(f => f.name.includes('0000'))
+    let content = await this.getFileContent(file.url)
+
+    let pullRequest = {
+      number: pr.number,
+      title: pr.title,
+      body: atob(content)
+    }
     
-    return atob(file.content);
+    this.state = {
+      ...this.state,
+      errorMessage: undefined,
+      current: pullRequest
+    }
+  }
+
+  async getFileContent(url) {
+    let response = await fetch(url)
+    let file = await response.json()
+
+    return file.content
   }
 
   changePage(direction, event) {
     event.preventDefault();
 
+    console.log('test');
+    
+
     const { page } = this.state;
     let newPage = page + direction === 'next' ? 1 : -1
 
-    this.loadPulls(this.state.filter, newPage);
+    this.loadRfcList(newPage);
   }
 
   filterPullRequests(filter) {    
-    this.loadPulls(filter, 1);
+    this.loadRfcList(filter);
   }
 
   parseRateLimitHeaders(headers: Headers) {

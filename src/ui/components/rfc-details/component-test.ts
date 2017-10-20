@@ -3,11 +3,11 @@ import hbs from '@glimmer/inline-precompile';
 
 const { module, test } = QUnit;
 
-module('Component: pull-request', function(hooks) {
+module('Component: rfc-details', function(hooks) {
   setupRenderingTest(hooks);
 
   test('it renders', async function(assert) {
-    await this.render(hbs`<pull-request />`);
+    await this.render(hbs`<rfc-details />`);
     assert.ok(this.containerElement.querySelector('div'));
   });
 });

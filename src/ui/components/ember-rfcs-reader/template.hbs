@@ -1,32 +1,18 @@
 <div class="row no-gutters">
-  <div class="sidebar">
-    <header>
-      <div class="btn-group">
-        <button class="btn btn-secondary" disabled={{openSelected}} onclick={{action filterPullRequests 'open'}}>Open</button>
-        <button class="btn btn-secondary" disabled={{closedSelected}} onclick={{action filterPullRequests 'closed'}}>Closed</button>
-        <button class="btn btn-secondary" disabled={{allSelected}} onclick={{action filterPullRequests 'all'}}>All</button>
-      </div>
-    </header>
-    <div class="pull-requests">
-      {{#each state.pullRequests key="pull.id" as |pull|}}
-        <pull-request 
-          @pr={{pull}} 
-          @selected={{state.current}} />
-      {{/each}}
-    </div>
-    <footer>
-      <ul class="pagination pagination-sm justify-content-center">
-        <li class="page-item {{if hasNoPrev 'disabled'}}">
-          <a href="#" class="page-link" onclick={{action changePage 'prev'}}>Prev</a>
-        </li>
-        <li class="page-item {{if hasNoNext 'disabled'}}">
-          <a href="#" class="page-link" onclick={{action changePage 'next'}}>Next</a>
-        </li>
-      </ul>
-    </footer>
+  <div class="col-3 col-lg-2">
+    <rfc-list       
+      @items={{state.pullRequests}} 
+      @current={{state.current}}
+      @hasPreviousPage={{state.hasPrev}} 
+      @hasNextPage={{state.hasNext}} 
+      @onFilterClick={{action filterPullRequests}}
+      @onPaginationClick={{action changePage}} />    
   </div>
-  <div class="main">
-    <pull-request-details @pr={{state.current}} />
+  <div class="col main">
+    {{#if state.errorMessage}}
+      <div class="alert alert-danger" role="alert">{{state.errorMessage}}</div>
+    {{/if}}
+    <rfc-details @item={{state.current}} />
     <footer>
       Github API status: {{state.rateLimitRemaining}} requests available out of {{state.rateLimit}} allowed. Reset in {{rateLimitResetRemaining}} seconds
     </footer>
