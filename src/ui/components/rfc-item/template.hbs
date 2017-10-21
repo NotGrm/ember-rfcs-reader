@@ -1,10 +1,10 @@
 <a href="/#/pull_requests/{{@item.number}}"
-  class="list-group-item list-group-item-action {{if @selected 'active'}}">
-  <header class="pull-request__header">
+  class="rfc-item {{if @selected 'rfc-item--selected'}}">
+  <header class="rfc-item__header">
     <small>#{{@item.number}}</small>
     <span class={{badgeClass}}>{{@item.state}}</span>
   </header>
-  <h3 class="pull-request__title">{{@item.title}}</h3> 
+  <h3 class="rfc-item__title">{{@item.title}}</h3> 
   <small>
       Created by 
       <a href={{@item.user.html_url}} target="_blank">{{@item.user.login}}</a>, {{timeago @item.created_at}}

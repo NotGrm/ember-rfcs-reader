@@ -1,20 +1,23 @@
-<div class="row no-gutters">
-  <div class="col-3 col-lg-2">
-    <rfc-list       
+<div class="grid-container">
+  <aside class="sidebar">
+    <rfc-list
       @items={{state.pullRequests}} 
       @current={{state.current}}
       @hasPreviousPage={{state.hasPrev}} 
       @hasNextPage={{state.hasNext}} 
       @onFilterClick={{action filterPullRequests}}
-      @onPaginationClick={{action changePage}} />    
-  </div>
-  <div class="col main">
+      @onPaginationClick={{action changePage}} />
+  </aside>
+  <header class="header">
+    <h1 class="text-center">{{state.current.title}}</h1>
+  </header>
+  <div class="content">
     {{#if state.errorMessage}}
       <div class="alert alert-danger" role="alert">{{state.errorMessage}}</div>
     {{/if}}
     <rfc-details @item={{state.current}} />
-    <footer>
-      Github API status: {{state.rateLimitRemaining}} requests available out of {{state.rateLimit}} allowed. Reset in {{rateLimitResetRemaining}} seconds
-    </footer>
   </div>
+  <footer class="footer">
+    Github API status: {{state.rateLimitRemaining}} requests available out of {{state.rateLimit}} allowed. Reset in {{rateLimitResetRemaining}} seconds
+  </footer>
 </div>

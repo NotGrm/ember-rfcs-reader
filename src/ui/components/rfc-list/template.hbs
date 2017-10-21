@@ -1,20 +1,20 @@
-<div class="sidebar">
-  <header>
+<div class="rfc-list">
+  <header class="rfc-list__header">
     <div class="btn-group">
       <button class="btn btn-secondary" disabled={{eq state.filter 'open'}} onclick={{action selectFilter 'open'}}>Open</button>
       <button class="btn btn-secondary" disabled={{eq state.filter 'closed'}} onclick={{action selectFilter 'closed'}}>Closed</button>
       <button class="btn btn-secondary" disabled={{eq state.filter 'all'}} onclick={{action selectFilter 'all'}}>All</button>
     </div>
   </header>
-  <div class="pull-requests">
+  <div class="rfc-list__content">
     {{#each @items key="item.id" as |item|}}
       <rfc-item 
         @item={{item}} 
         @selected={{eq item.number @current.number}} />
     {{/each}}
   </div>
-  <footer>
-    <ul class="pagination pagination-sm justify-content-center">
+  <footer class="rfc-list__footer">
+    <ul class="pagination pagination-sm">
       <li class="page-item {{if (not @hasPreviousPage) 'disabled'}}">
         <a href="#" class="page-link" onclick={{action @onPaginationClick 'prev'}}>Prev</a>
       </li>
