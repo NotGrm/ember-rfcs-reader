@@ -1,65 +1,62 @@
 @import 'node_modules/bootstrap/scss/bootstrap';
 
-h1 {
-  color: #444;
-}
-
-.no-gutters {
-  margin-right: 0;
-  margin-left: 0;
-
-  > .col,
-  > [class*="col-"] {
-    padding-right: 0!important;
-    padding-left: 0!important;
-  }
-}
-
-.sidebar, .main {
+.grid-container {
   height: 100vh;
-  max-height: 100vh;
-}
 
-.main {
+  display: grid;
+  grid-template-columns: 25% 1fr;
+  grid-template-rows: 60px 1fr 30px;
+
+  .sidebar {
+    grid-row: 1 / 4;
+  }
+
   .content {
-    overflow: scroll;
+    overflow-y: scroll;
+  }
+
+  .footer {
+    @extend .text-muted;
+    text-align: center;
   }
 }
 
-.sidebar {
-  display: flex;
-  flex-direction: column;
+.rfc-list {
+  height: 100%;
 
-  > header {
-    height: 60px;
+  display: grid;
+  grid-template-rows: 60px 1fr 30px;
+
+  &__header {
+    justify-self: center;
+    align-self: center;
   }
 
-  > footer {
-    height: 30px;
-  }
+  &__content {
+    overflow-y: scroll;
 
-  > header, > footer {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-
-    padding-top: 0.25rem;
-    padding-bottom: 0.25rem;
-  }
-
-  .pull-requests {
     @extend .list-group;
+  }
 
-    flex-grow: 2;
-    flex-basis: auto;
-
-    overflow: scroll;
+  &__footer {
+    justify-self: center;
   }
 }
 
-.pull-request {
+.rfc-item {
   @extend .list-group-item;
   @extend .list-group-item-action;
+
+  &--selected {
+    z-index: 2;
+    color: $white!important;
+    background-color: $primary!important;
+    border-color: $primary!important;
+
+    a {
+      color: $purple;
+    }
+  }
 
   &__header {
     width: 100%;
@@ -75,22 +72,5 @@ h1 {
     overflow-x: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-  }
-}
-
-.main {
-
-  display: flex;
-  flex-direction: column;
-
-  .content {
-    flex-grow: 2;
-  }
-
-  > footer {
-    @extend .text-muted;
-
-    height: 30px;
-    text-align: center;
   }
 }
