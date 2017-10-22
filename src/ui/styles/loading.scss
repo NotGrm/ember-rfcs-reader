@@ -1,0 +1,86 @@
+$color: $gray-700;
+
+.loader-layout {
+  height: 100%;
+  display: flex; 
+  align-items: center; 
+  justify-content: center;
+}
+
+// The good stuff...
+
+.loader,
+.loader span,
+.loader:before,
+.loader span:before,
+.loader:after,
+.loader span:after {
+  content: "";
+  display: block;
+  width: 0;
+  height: 0;
+  border: solid 12px $color;
+  border-radius: 50%;
+  box-shadow: 0px 0px 12px 0px rgba(255,255,255,1);
+}
+
+.loader,
+.loader span {
+  position: relative;
+
+  &:before,
+  &:after {
+    position: absolute;
+    top: 65px;
+  }
+  
+  &:before {
+    left: 35px;
+    background: $color;
+  }
+  
+  &:after {
+    right: 35px;
+    background: $color;
+  }
+}
+
+.loader {
+  top: -50px;
+  
+  span {
+    transform: rotate(180deg);
+    top: 90px;
+    left: -10px;
+  }
+}
+
+.loader {
+  animation: pulsein 0.8s infinite;
+  
+  &:before,
+  &:after {
+    animation: pulsein 0.8s infinite;
+  }
+  
+  span {
+    animation: pulseout 0.8s infinite;
+    
+    &:before,
+    &:after {
+      animation: pulseout 0.8s infinite;
+    }
+  }
+}
+
+@keyframes pulsein {
+  0% { border-width: 8px; }
+  50% { border-width: 12px }
+  100% { border-width: 8px; }
+}
+
+@keyframes pulseout {
+  0% { border-width: 12px; }
+  50% { border-width: 8px }
+  100% { border-width: 12px; }
+}
