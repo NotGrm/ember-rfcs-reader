@@ -7,11 +7,7 @@
     </div>
   </header>
   <div class="rfc-list__content">
-    {{#each @items key="item.id" as |item|}}
-      <rfc-item 
-        @item={{item}} 
-        @selected={{eq item.number @current.number}} />
-    {{/each}}
+    {{yield}}
   </div>
   <footer class="rfc-list__footer">
     <ul class="pagination pagination-sm">

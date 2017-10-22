@@ -17,6 +17,8 @@ export default class EmberRfcsReader extends Component {
     errorMessage: undefined,
     current: undefined,
     pullRequests: [],
+    itemsLoading: false,
+    detailsLoading: false
   }
 
   @tracked('state')
@@ -53,6 +55,11 @@ export default class EmberRfcsReader extends Component {
   }
 
   async loadRfcList(page = 1, filter = 'open') {  
+    this.state = {
+      ...this.state,
+      itemsLoading: true
+    }
+
     let response = await fetch(`${GITHUB_REPOS_API_URL}/${EMBERJS_RFCS_REPO}/pulls?page=${page}&state=${filter}`);
     
     this.parseRateLimitHeaders(response.headers);
@@ -66,13 +73,20 @@ export default class EmberRfcsReader extends Component {
     this.state = {
       ...this.state,
       page,
-      pullRequests
+      pullRequests,
+      itemsLoading: false
     }
   }
 
   async loadRfcContent(pr) {    
     const { body, head } = pr;
     const { ref, repo } = head;
+
+    this.state = {
+      ...this.state,
+      current: null,
+      detailsLoading: true
+    }
 
     let response = await fetch(`${GITHUB_REPOS_API_URL}/${repo.full_name}/contents/text?ref=${ref}`);
     let files = await response.json();
@@ -89,7 +103,8 @@ export default class EmberRfcsReader extends Component {
     this.state = {
       ...this.state,
       errorMessage: undefined,
-      current: pullRequest
+      current: pullRequest,
+      detailsLoading: false
     }
   }
 

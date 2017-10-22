@@ -1,12 +1,21 @@
 <div class="grid-container">
   <aside class="sidebar">
     <rfc-list
-      @items={{state.pullRequests}} 
-      @current={{state.current}}
       @hasPreviousPage={{state.hasPrev}} 
       @hasNextPage={{state.hasNext}} 
       @onFilterClick={{action filterPullRequests}}
-      @onPaginationClick={{action changePage}} />
+      @onPaginationClick={{action changePage}} >
+
+      {{#if state.itemsLoading}}
+        <loading-icon />
+      {{else}}
+        {{#each state.pullRequests key="item.id" as |item|}}
+          <rfc-item 
+            @item={{item}} 
+            @selected={{eq item.number state.current.number}} />
+        {{/each}}
+      {{/if}}
+    </rfc-list>
   </aside>
   <header class="header">
     <h1 class="text-center">{{state.current.title}}</h1>
@@ -15,7 +24,16 @@
     {{#if state.errorMessage}}
       <div class="alert alert-danger" role="alert">{{state.errorMessage}}</div>
     {{/if}}
-    <rfc-details @item={{state.current}} />
+
+    {{#if state.pullRequests}}
+      {{#if state.detailsLoading}}
+        <loading-icon />
+      {{else}}
+        <rfc-details 
+          @item={{state.current}}
+          @itemLoading={{state.detailsLoading}} />
+      {{/if}}
+    {{/if}}
   </div>
   <footer class="footer">
     Github API status: {{state.rateLimitRemaining}} requests available out of {{state.rateLimit}} allowed. Reset in {{rateLimitResetRemaining}} seconds
