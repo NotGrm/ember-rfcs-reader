@@ -2,6 +2,7 @@ import Component, { tracked } from '@glimmer/component';
 import Showdown from 'showdown';
 
 const converter = new Showdown.Converter();
+converter.setFlavor('github');
 
 export default class RfcDetails extends Component {
   @tracked state = {
